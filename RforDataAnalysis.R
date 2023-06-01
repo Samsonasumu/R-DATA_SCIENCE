@@ -158,4 +158,5 @@ ggplot(data=dl,aes(x=name,y=hr,fill=type))+
 
 
 
+![boxplot](https://github.com/Samsonasumu/R-DATA_SCIENCE/assets/99386103/8cff5514-8dca-4195-a3cd-a5d4ab3ab7a2)
 
