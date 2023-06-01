@@ -1,0 +1,185 @@
+---
+title: "RMHI/ARMP Problem Set 2"
+author: 'Your name and ID goes here [Word Count: XX]'
+---
+
+Please put your answers here, following the instructions in the assignment description. Put your answers and word count tallies in the locations indicated; if none is indicated that means there is no word count for that question. Remember to knit as you go, and submit the knitted version of this on Canvas.
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+# We'll begin by loading up the libraries and data we need, as always.
+knitr::opts_chunk$set(echo = TRUE)
+
+# loading the libraries
+library(tidyverse)
+library(here)
+library(ggplot2)
+library(lsr)
+library(RColorBrewer)
+library(car)
+
+# loading datasets
+do <- read_csv(file=here("others.csv"))
+dl <- read_csv(file=here("liedetector.csv"))
+dd <- read_csv(file=here("otherdata.csv"))
+dd$size <- as.factor(dd$size)
+ddt2 <- dd %>% filter(time=="t2")
+```
+
+## Q1 
+
+```{r q1, warning=FALSE, message=FALSE, fig.width=3, fig.height=3}
+
+# put your code here
+#head(do, 5)
+```
+
+*ANSWER: Put your answer here. [Word count: XX]* 
+
+
+## Q2 
+
+```{r q2, warning=FALSE, message=FALSE, fig.width=4.7, fig.height=4}
+# put your code here
+# QUESTION 1 :A Pearson correlation test was used to test for the 
+#correlation between height and scariness.
+cor.test(do$height, do$scariness, 
+                method = "pearson")
+
+```
+
+
+## Q3 
+
+```{r q3, warning=FALSE, message=FALSE, fig.width=3, fig.height=3}
+# put your code here
+dd <- read_csv(file=here("otherdata.csv"))
+
+head(dd,4)
+t.test(dd$health ~ dd$time, var.equal = TRUE)
+ 
+t.test(dd$health ~ dd$time, var.equal = TRUE)
+
+#	Two Sample t-test
+
+#data:  dd$health by dd$time
+#t = 3.4088, df = 64, p-value = 0.001134
+#alternative hypothesis: true difference in means between group t1 and group #t2 is not equal to 0
+#95 percent confidence interval:
+ # 3.988911 15.283816
+#sample estimates:
+#mean in group t1 mean in group t2 
+ #       76.45455         66.81818 
+
+
+
+#disabled <- dd[dd$disability == 'TRUE',]
+#dim(disabled)
+ddt2 <- dd %>% filter(time=="t2")
+dim(ddt2)
+
+t.test(ddt2$health ~ ddt2$size, var.equal = TRUE)
+#oneway.test(health ~ size,
+#+             data = ddt2,
+#+             var.equal = TRUE)
+
+#	One-way analysis of means
+
+#data:  health and size
+#F = 2.4855, num df = 2, denom df = 30, p-value = 0.1003
+
+```
+
+*ANSWER: Put your answer here. [Word count: XX]* 
+
+
+## Q4
+
+**Q4a**
+
+```{r q4a, warning=FALSE, message=FALSE, fig.width=3.5, fig.height=3}
+# put your code here
+gfg_table =table(dd$time, dd$disability )
+gfg_table
+chisq.test(dd$time, dd$disability, correct=FALSE)
+```
+
+*ANSWER: Put your answer here. [Word count: XX]* 
+
+
+**Q4b**
+
+```{r q4b, warning=FALSE, message=FALSE, fig.width=3.5, fig.height=3}
+# put your code here
+anova(lm(health ~ size, data=ddt2))
+
+```
+
+*ANSWER: Put your answer here. [Word count: XX]* 
+
+## Q5
+
+```{r q5, warning=FALSE, message=FALSE, fig.width=3.5, fig.height=3}
+# put your code here
+fit <- lm(health ~ height, data = ddt2)
+summary(fit)
+```
+
+*ANSWER: Put your answer here. [Word count: XX]* 
+
+
+## Q6
+
+*ANSWER: Put your answer here. [Word count: XX]* 
+
+
+## Q7
+
+
+```{r q7, warning=FALSE, message=FALSE, fig.width=3.5, fig.height=3}
+# put your code here
+dl <- read_csv(file=here("liedetector.csv"))
+head(dl)
+t.test(hr ~ type, data = dl)
+```
+
+*ANSWER: Assumption 1: Put your answer here. Assumption 2: Put your answer here [Word count: XX]* 
+
+
+## Q8
+
+```{r q8, warning=FALSE, message=FALSE, fig.width=3.5, fig.height=3}
+# put your code here
+# QUESTION 3: A two sided two sample t test was used to test for the difference in 
+#the average of the heartbeat
+head(dl)
+t.test(hr ~ type, mu=0,alt="two.sided",data = dl)
+```
+
+*ANSWER: Put your answer here. [Word count: XX]* 
+
+## Q9
+
+**Q9a**
+
+```{r q9a, warning=FALSE, message=FALSE, fig.width=3.5, fig.height=3}
+# put your code here
+#QUESTION TWO VISUALIZING THE BOXPLOT
+library(ggplot2)
+ggplot(data=dl,aes(x=name,y=hr,fill=type))+
+  geom_boxplot()+
+   ggtitle("Performance on lie detector test")+
+  xlab("Name of the person")+
+  ylab("Heart Rate")+
+  geom_boxplot(trim=FALSE,,)+
+  theme(
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size=18,hjust = 0.5),
+        legend.key.height = unit(1,"cm"),
+        legend.key.width = unit(1,"cm"),
+        legend.position=c(0.1,0.9))+
+  guides(fill=guide_legend(title = "disp"))
+
+
+```
+
+ 
