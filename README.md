@@ -12,3 +12,6 @@ this is the dataset
 
 
 R for data science
+
+
+![boxplot](https://github.com/Samsonasumu/R-DATA_SCIENCE/assets/99386103/8cff5514-8dca-4195-a3cd-a5d4ab3ab7a2)
