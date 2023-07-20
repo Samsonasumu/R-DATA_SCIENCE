@@ -1,0 +1,136 @@
+---
+title: "CEMA-sam.Rmd"
+author: "SAMSON MWOLE"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ 
+```{r dataset}
+ data <- read.csv("https://raw.githubusercontent.com/cema-uonbi/internship_task/main/data/cema_internship_task_2023.csv")
+head(data,2)
+```
+
+## DATA ANALYSIS
+
+
+
+```{r DATA}
+colnames(data)
+```
+
+```{r dimension}
+dim(data)# rows and  columnS
+```
+
+```{r ifMissing}
+is.null(data)
+
+```
+
+## Checking for missing values in the dataframe
+
+
+```{r sumMissing}
+sum(is.na(data$Acute.Malnutrition ))#some missing null
+```
+
+ 
+# summary of the dataset
+```{r summarry}
+summary(data)#min mean median 1st and 3rd quartiles
+```
+ 
+# checking for outliers using a boxplot
+
+```{r  outliers}
+boxplot(data$diarrhoea.cases)#some outlier present
+```
+
+```{r  manipulate}
+install.packages("tidyverse")
+library(tidyverse)
+
+aa <- data %>%
+  group_by(county)  %>%
+  summarise(avg_TotalDewormed_monthly = mean(Total.Dewormed	)) %>%
+arrange(desc(avg_TotalDewormed_monthly))
+
+aa
+```
+
+
+# Relationship between the 2
+```{r  relationship}
+library(ggplot2)
+
+ggplot(data, aes(x=data$Acute.Malnutrition, y=data$Underweight.0..6.months)) +
+  theme_bw() + 
+  geom_jitter(alpha=0.25) + 
+  geom_smooth() + 
+  labs(x="Malnutrition", y="0-6 underweight")
+```
+# correlation between malnutrition and underweight
+
+```{r  correlation}
+res <- cor.test(data$Acute.Malnutrition, data$Underweight.0..6.months,                     method = "pearson")
+res
+
+```
+
+# What is the average stunted growth in kitui county of kids between 0 and 6
+```{r  kitui}
+asb <- filter(data, county == "Kitui County")%>%
+  summarise(avg_stunted = mean(stunted.0..6.months	))
+  
+asb
+```
+
+
+```{r   histogram }
+hist(data$diarrhoea.cases)
+```
+
+
+
+# Correlation matrix
+```{r    correlation map }
+install.packages("lattice")
+library(lattice)
+
+tmp <- data %>% 
+  dplyr::select( "Total.Dewormed" , "Acute.Malnutrition",       "stunted.6.23.months","stunted.0..6.months"   ,  
+ "stunted.24.59.months", "diarrhoea.cases", "Underweight.0..6.months" , "Underweight.6.23.months" , "Underweight.24.59.Months")
+head(tmp)
+# rounding to 2 decimal places
+corr_m <- round(cor(tmp),2) 
+head(corr_m)  
+
+# CORRELATION HEATMAP
+install.packages("reshape2")
+library(reshape2)
+  
+# reduce the size of correlation matrix
+melted_corr_mat <- melt(corr_m)
+# head(melted_corr_mat)
+
+# section c questio 2 plotting the correlation heatmap
+library(ggplot2)
+ggplot(data = melted_corr_mat, aes(x=Var1, y=Var2,
+                                   fill=value)) +
+  geom_tile()
+```
+
+# 2 sample t test to test for the difference in mean between stunted.0..6.months and stunted.24.59.months
+
+```{r 2 sample t test }
+t.test(data$stunted.0..6.months, data$stunted.24.59.months, var.equal = TRUE)
+```
