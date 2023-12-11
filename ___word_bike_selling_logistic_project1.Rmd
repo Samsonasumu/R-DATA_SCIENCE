@@ -1,0 +1,192 @@
+---
+title: "bike_selling"
+author: "authour"
+date: "2023-11-30"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+The research question
+Is there a relationship between income and the likelihood of purchasing a bike ?
+The following factors or parameters from the dataset can be utilized to ascertain the connection between income and the probability of buying a bike:
+1. Income: One predictor variable that can be used is the person's income level. It makes sense that those who earn more money would be more likely to buy a bike since they might have more money available for other uses, such transportation and recreation.
+2. Likelihood of buying a bike: This variable indicates the likelihood that a person will buy a bike. It might be utilized as the dependent variable in order to ascertain how revenue and it are related.
+
+
+Data-driven, computational approach may be useful
+Because a data-driven, computational method makes it possible to analyze a lot of data and find patterns and interactions between variables, it might be helpful in addressing the research topic. In this instance, the methodology can assist in ascertaining whether income and the probability of buying a bike are significantly correlated.
+	
+The data can be evaluated to develop a predictive model that quantifies the association between income and the possibility of buying a bike by applying computer techniques like logistic regression. To further understand the influence of income on the purchasing choice, the model can incorporate additional factors like age, gender, education, occupation, and marital status.
+A data-driven, computational approach may be useful in addressing the research topic since it enables the analysis of large amounts of data and the discovery of patterns and relationships between variables. In this case, the technique can help determine whether there is a substantial correlation between income and the likelihood of purchasing a bike.
+
+
+```{r cars}
+library(tidyverse)
+library(dplyr)
+
+df <- read_csv("C:/Users/samso/Desktop/DATASETSS/bike_buyers.csv")
+
+head(df)
+```
+
+
+Computational Method
+ 	
+ The necessary data wrangling steps to make the data ready for subsequent analyses
+Handling null values
+
+
+```{r isnull}
+sum(is.na(df))
+```
+
+```{r dim}
+dim(df)
+```
+
+The initial step was to fill in the missing values in the dataset so that the data was prepared for analysis. This was accomplished by determining that 53 values were missing and dealing with them. For uniformity and clarity, one of the columns was also renamed from "Purchased Bike" to "Purchased_Bike". Following these modifications, the `na.omit()} method was used to clean the dataset by eliminating any observations that had missing values. After the cleaned dataset was created and named `df_clean}, it was verified that the required modifications had been applied by using the `head()` function to inspect the first few rows.
+
+```{r missing}
+#renaming column
+df <- df %>% rename(Purchased_Bike = "Purchased Bike")
+
+df_clean <- na.omit(df)
+
+head(df_clean)
+```
+
+```{r summary}
+summary(df_clean)
+
+```
+The "Purchased_Bike" variable in the above code snippet needs to be changed from a string ("Yes" or "No") to a numeric form in order to produce the binary indicator variable "Purchased_numeric". When a customer purchases a bike, this variable assigns a value of 1, and when they don't, it assigns a value of 0. With the use of this numerical representation, we can examine and improve the interpretability of our models and make it easier to use other machine learning algorithms that can work with numeric data by transforming categorical variables into numerical form. In order to optimize model performance and derive significant insights from the data, this transformation is essential.
+```{r explore}
+#convert from string to numeric
+df_clean$Purchased_numeric <- ifelse(df_clean$Purchased_Bike == "Yes", 1, 0)
+#What exploratory analyses and modeling techniques can be used to answer the research
+#questions?
+summary(df_clean$Income)
+
+```
+
+ 
+## Including Plots
+
+Exploratory analyses 
+Finding broad patterns in the data is the goal of exploratory data analysis, or EDA. Outliers and potentially surprising data elements are included in these patterns. According to Tukey (2018), in any data analysis process, EDA is a crucial initial step. Designing statistical analyses that produce insightful results can be aided by knowing the locations of outliers and the relationships between variables.
+
+You can also embed plots, for example:
+
+The fact that the whiskers in the box plot of income reach far beyond the upper and lower quartiles suggests that certain data points are much higher or lower than the rest of the data. This implies that there may be outliers in the dataset. It is crucial to remember that outliers can significantly affect how statistical analysis turns out. Consequently, before beginning any study, it's critical to recognize and deal with outliers.
+```{r income, echo=FALSE}
+boxplot(df_clean$Income)
+```
+
+With the income range on the x-axis and the frequency on the y-axis, the histogram displays the frequency of each income range. Additionally, the histogram demonstrates the right-skewed income distribution, which indicates that there are more individuals with lower incomes than with higher incomes.
+```{r histogram, echo=FALSE}
+library(ggplot2)
+hist(df_clean$Income) 
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r income2, echo=FALSE}
+ 
+#relationship between those purchased and the salary
+ggplot(df_clean, aes(x=Purchased_numeric, y=Income)) + 
+  geom_bar(stat = "identity")+
+  scale_fill_brewer(palette = "steelblue") +
+  theme(legend.position="none")
+ 
+```
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r  s, echo=FALSE}
+#correlation analysis
+tmp <- df_clean %>% 
+  dplyr::select('Income','Age','Children','Purchased_numeric')
+head(tmp)
+#install.packages("lattice")
+library(lattice)
+
+# rounding to 2 decimal places
+corr_m <- round(cor(tmp),2) 
+head(corr_m)  
+```
+
+```{r corrMat, echo=FALSE}
+#CORRELATION HEATMAP
+#install.packages("reshape2")
+library(reshape2)
+
+
+# reduce the size of correlation matrix
+melted_corr_mat <- melt(corr_m)
+# head(melted_corr_mat)
+
+# section c questio 2 plotting the correlation heatmap
+library(ggplot2)
+ggplot(data = melted_corr_mat, aes(x=Var1, y=Var2,
+                                   fill=value)) +
+  geom_tile()
+
+```
+
+Age and the numerical depiction of purchasing behavior have a weakly negative association (-0.11), while the number of children has a weakly negative correlation (-0.12). These marginally negative correlations imply that people who are younger and have fewer children are marginally more likely to be buyers.
+A 0.05 correlation suggests a somewhat positive association between income and buying a bike. 
+This suggests that there is a weak correlation, if any, between income and the decision to buy a bike. Although there may be a little increase in the likelihood of bike purchases among those with greater salaries, the connection indicates that income is not a significant factor in determining whether or not someone purchases a bike.
+
+```{r model}
+df_model1 <- subset(df_clean, select = c(Purchased_numeric,Income))
+
+model <- glm( Purchased_numeric ~ Income, data = df_model1, family = binomial)
+summary(model)$coef
+coef(model)
+```
+Based on a customer's income, a logistic regression model was used to forecast whether or not the customer will buy a numerical product. The glm() function in R is used to fit the model, and the family = binomial argument is used to indicate that the result is binary. The estimated model coefficients can be seen in the summary() function's output. Since the intercept coefficient is -2.62, when income is zero, the log probabilities of buying the product are -2.62. The log chances of buying the product rise by 3.18e-6 for every unit increase in income, according to the income coefficient of 3.18e-6. The overall model fit is significant, as indicated by the p-value of (<0.05). This means that the model is better able to predict the outcome.
+
+```{r logi}
+#multiple logistic
+model2 <- glm( Purchased_numeric ~ Income + Age, data = df_clean, family = binomial)
+summary(model2)
+
+```
+The model's statistical significance is demonstrated by the output, where the total model fit has a p-value of less than 0.001. With p-values of 0.000197 and 0.0307 for each predictor variable, the coefficients for both predictor variables are likewise statistically significant. Since the income coefficient is positive, there is a positive correlation between income and the likelihood of making a purchase. Age has a negative coefficient, meaning that being older is linked to a lower chance of making a purchase. The chance of purchasing is predicted to rise by 4.679e-06 for every unit increase in income.
+
+```{r logi2}
+coef(model2)
+
+```
+ 
+ 
+ 
+ Conclusion 
+
+In conclusion, the chance of purchasing is predicted to rise by 4.679e-06 for every unit increase in income. The analysis answers the research question. The results show that there is a positive relationship between income and the likelihood of purchasing a bike. This means that people with higher incomes are more likely to purchase a bike than people with lower incomes.
+The analysis is restricted to the particular set of data that the model was trained on. This implies that extrapolating the findings to other populations would be difficult. For instance, people with varying educational backgrounds or nationalities may not be able to use the results. Furthermore, the model simply takes age and income into account as predictor factors. Other variables, like gender, race, or ethnicity, might also have an impact on a person's propensity to buy a bike.
+The analysis's findings imply that the chance of buying a bike and income are positively correlated. It's crucial to remember that correlation does not imply causation. It is plausible that there exists an additional element contributing to the rise in both bike ownership and income. It's plausible, for instance, that residents of affluent areas are more likely to have access to bike lanes and other facilities that make riding more easy. In such a scenario, there may not be a direct relationship between bike ownership and income.
+There are many limits to the analysis that may impact how broadly applicable the findings are. Self-reported data, which the model is built on, may be biased. Additionally, the model does not account for bike prices, which can differ based on the kind of bike and the area. Furthermore, depending on the area, the availability of bikes may vary, something that the model does not account for. Notwithstanding these drawbacks, the analysis offers some insights into how income and the likelihood of buying a bike relate to one another. These discoveries may help guide future studies and legislative choices. To ascertain whether the analysis's findings are generally applicable, more investigation is required. Studies that gather data from a more diversified population may be included in this research.
+
+References
+Tukey, J. W. (1977). Exploratory data analysis (Vol. 2, pp. 131-160).
+EXPLORATORY DATA ANALYSIS
+https://theta.edu.pl/wp-content/uploads/2012/10/exploratorydataanalysis_tukey.pdf
+
+
+ 
+
+

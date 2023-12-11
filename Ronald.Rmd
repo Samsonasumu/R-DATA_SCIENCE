@@ -1,0 +1,131 @@
+# Q7. Rewrite the code in R
+
+### Read the data files
+
+```{r}
+txt <- readLines('./data/ml-1m/users.dat')
+txt_split <- lapply(strsplit(txt, '::'), 
+                    function(x) as.data.frame(t(x), stringsAsFactors=FALSE))
+users <- do.call(rbind, txt_split)
+names(users) <- c('user_id', 'gender', 'age', 'occupation', 'zip')
+
+
+txt <- readLines('./data/ml-1m/movies.dat', encoding = 'latin1')
+txt_split <- lapply(strsplit(txt, '::'), 
+                    function(x) as.data.frame(t(x), stringsAsFactors=FALSE))
+movies <- do.call(rbind, txt_split)
+names(movies) <- c('movie_id', 'title', 'genres')
+
+
+txt <- readLines('./data/ml-1m/ratings.dat')
+txt_split <- lapply(strsplit(txt, '::'), 
+                    function(x) as.data.frame(t(x), stringsAsFactors=FALSE))
+ratings <- do.call(rbind, txt_split)
+names(ratings) <- c('user_id', 'movie_id', 'rating', 'timestamp')
+
+```
+
+```{r}
+print(dim(users))
+```
+
+```{r}
+head(users)
+```
+
+```{r}
+print(dim(movies))
+```
+
+```{r}
+head(movies)
+```
+
+```{r}
+print(dim(ratings))
+```
+
+```{r}
+head(ratings)
+```
+
+### Create a merged database
+
+```{r}
+genre_list <- strsplit(movies$genres, '\\|')
+main_genre <- sapply(genre_list, function(x) x[1])
+movies_1 <- movies
+movies_1$main_genre <- main_genre
+print(dim(movies_1))
+```
+
+```{r}
+head(movies_1)
+```
+
+```{r}
+genres_unique <- unique(unlist(genre_list))
+dummies_matrix <- matrix(0, nrow=nrow(movies_1), ncol=length(genres_unique))
+
+for (i in 1:length(genres_unique)) {
+  dummies_matrix[grepl(genres_unique[i], movies_1$genres), i] <- 1
+}
+
+genre_dummies <- as.data.frame(dummies_matrix)
+colnames(genre_dummies) <- genres_unique
+
+movies_2 <- cbind(movies_1, genre_dummies)
+
+print(dim(movies_2))
+```
+
+```{r}
+head(movies_2)
+```
+
+```{r}
+ratings_movies <- merge(ratings, movies_2, by='movie_id', all.x=TRUE)
+df1 <- merge(ratings_movies, users, by="user_id", all.x=TRUE)
+df1$rating <- as.numeric(df1$rating)
+print(dim(df1))
+```
+
+```{r}
+
+head(df1)
+```
+
+### (a) Show up to 20 genres with the highest number of responses from users
+
+```{r}
+genre_response <- table(df1$main_genre)
+genre_response <- as.data.frame(genre_response)
+colnames(genre_response) <- c("main_genre", "response")
+genre_response_sorted <- genre_response[order(-genre_response$response), ]
+rownames(genre_response_sorted) <- 1:nrow(genre_response_sorted)
+genre_response_sorted
+
+```
+
+### (b) Show the top 20 genres sorted by average ratings
+
+```{r}
+genre_average_ratings <- aggregate(df1$rating, by=list(df1$main_genre), mean)
+colnames(genre_average_ratings) <- c('main_genre', 'average_rating')
+genre_average_ratings_sorted <- genre_average_ratings[order(-genre_average_ratings$average_rating), ]
+rownames(genre_average_ratings_sorted) <- 1:nrow(genre_average_ratings_sorted)
+genre_average_ratings_sorted
+
+```
+
+### (c) Show the top 20 movies sorted by descending mean female ratings for a specific genre (say Drama)
+
+```{r}
+female <- df1[df1$gender == 'F', ]
+female_drama <- female[female$Drama == 1, ]
+female_drama_average_ratings <- aggregate(female_drama$rating, by=list(female_drama$title), mean)
+colnames(female_drama_average_ratings) <- c("title", "average_female_rating")
+female_drama_average_ratings_sorted <- female_drama_average_ratings[order(-female_drama_average_ratings$average_female_rating), ][1:20,]
+rownames(female_drama_average_ratings_sorted) <- 1:nrow(female_drama_average_ratings_sorted)
+female_drama_average_ratings_sorted
+```

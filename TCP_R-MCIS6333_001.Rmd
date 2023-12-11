@@ -1,0 +1,201 @@
+# Team, insert the required components wherever indicated below on the raw, original version of this R codebook .Rmd file.
+
+# TCP_R-MCIS6333_001
+
+# Data Visualization Programming Team Course Project
+# [INSERT YOUR USE CASE CLIET NAME]
+# [INSERT YOUR USE CASE SUBJECT (this is either a product or service; for example: Food and Beverage Stands)]
+
+# Created by:
+# [INSERT YOUR TEAM #]
+# [INSERT YOUR TEAM NAME]
+# [INSERT FULL NAME OF TEAM MEMBER HERE]
+# [INSERT FULL NAME OF TEAM MEMBER HERE]
+# [INSERT FULL NAME OF TEAM MEMBER HERE]
+# [IF YOU HAVE LESS THAN THREE TEAM MEMBERS, IT IS OKAY TO DELETE THE EXTRA NAME HOLDERS FROM ABOVE AND THIS LINE]
+
+# Created for Dr. Esther Mead, SAU Fall 2023
+
+# Created November 2, 2023
+
+#========================SECTION SEPARATOR
+
+# Student team, below this section, insert all code for data processing and data visualization (DV) that you used for any and all DVs that you created in R and inserted into your TCP OPR/PRES (you must have at least one R DV and no more than 9 R DVs).
+# You must include all R code below that in necessary to recreate your DVs within the R web-based development environment (Posit Cloud RStudio Cloud): https://login.rstudio.cloud/login?redirect=%2F
+# You must also insert optimized R code documentation lines throughout this notebook.
+# Read the TCP Grading Rubric on Blackboard to prevent irreversible point penalties.
+# Point penalties will be applied to all teams equally and are non-negotiable. All teams are treated equally.
+
+#========================SECTION SEPARATOR
+
+```{r }
+library(readxl)
+d1 <- read_excel("/datasets/10 - College Energy Drink - M1 - Initial dataset-2.xlsx")
+d2 <- read_excel("/datasets/10 - College Energy Drink - M2 - Change Over Time-2.xlsx")
+d3 <- read_excel("/datasets/10 - College Energy Drink - M3 - Data Composition-2.xlsx")
+d4 <- read_excel("/datasets/10 - College Energy Drink - M4 - Data Distributions-1.xlsx")
+d5 <- read_excel("/datasets/10 - College Energy Drink - M5 - Group Comparisons-1.xlsx")
+d6 <- read_excel("/datasets/10 - College Energy Drink - M6 - Relationships.xlsx")
+d7 <- read_excel("/datasets/10 - College Energy Drink - M7 - Geographical Data.xlsx")
+```
+
+
+
+```{r }
+library(ggplot2)
+
+head(d6, 4)
+```
+
+
+```{r }
+library(dplyr)
+library(ggplot2)
+v <- table(d6$Q26)
+v
+```
+
+```{r }
+
+label <- c("I will not buy (-3)",	"Highly Unlikely (-2)",	"Unlikely (-1)",	"Unsure (0)",	"Likely (1)",	"Highly Likely (2)")
+num <- c(35, 74, 24, 19, 13 ,10 )
+hn <- data.frame(cbind(label,num))
+hn
+```
+
+
+```{r echo=FALSE}
+ 
+hn$label <-as.factor(hn$label)
+ggplot(hn,aes(label,num))+geom_point(size=3)+geom_line(color='red')+
+  labs(title = "How likely are you to buy an energy drink during: Late Night (9pm to Midnight)")
+
+```
+ 
+
+
+```{r}
+# spending
+hg <- table(d5$Q17)
+hg
+la <- c("I do not drink energy drinks (0)","$0.99 or less (1)","	$1 to $1.99 (2)","	$2 to $2.99 (3)","	$3 to $3.99 (4)","	$4 to 4.99 (5)" )
+number <- c(17, 20, 74, 60,  3,  1 )
+j <- data.frame(cbind(la,number)) 
+j
+```
+```{r echo=FALSE}
+#plot mosaic
+spend_perENERGY <- table(j$la,j$number)
+mosaicplot(spend_perENERGY)
+
+```
+
+ 
+ 
+ 
+```{r}
+a <- table(d5$Q20)
+a
+
+pay <- c("I would not buy (0)",	"$0.99 or less (1)",	"$1 to $1.99 (2)",	"$2 to $2.99 (3)",	"$3 to $3.99 (4)",	"$4 to 4.99 (5)",	"$5 or more (6)")
+
+ 
+amount <- c( 46, 27, 45, 45 , 9  ,3,0 )
+f <- data.frame(cbind(pay,amount)) 
+
+f
+
+```
+
+
+
+```{r echo=FALSE}
+library(ggplot2)
+f$pay <-as.factor(f$pay)
+
+ggplot(data=f,aes(x=pay,y=amount))+
+  geom_boxplot()+labs(title = " pay for an energy drink that is branded for your specific college if it were organic?")
+  
+
+```
+```{r }
+
+```
+
+
+
+```{r }
+library(dplyr)
+library(ggplot2)
+
+b <- table(d5$Q17)
+
+pay_sum <- c("$0.99 or less","$1 to $1.99", "$2 to $2.99","$3 to $3.99","c$4 to 4.99" )
+
+#label <- c(0, 1,2,3,4,5 )
+amount <- c(17, 20, 74, 60,  3,  1 )d
+f <- data.frame(cbind(pay_sum,amount)) 
+
+ggplot(f) +
+  geom_bar(aes(x = amount, fill = amount)) +
+  xlab("sum") + ylab("Count")
+
+```
+
+```{r }
+library(ggplot2)
+
+a <- table(d5$Q18)
+a
+barplot(a)
+#ow much would you be willing to pay for an energy drink that is branded for your specific college?
+#d <- c("$0.99 or less (1)",	"$1 to $1.99 (2)",	"$2 to $2.99 (3)",	"$3 to $3.99 (4)","$4 to 4.99 (5)",	"$5 #or more (6)")
+ 
+#y <- c(55, 11, 30, 54, 22,  2,  1 )
+#ggplot(data=d5,aes(x=d,y=y))+
+ # geom_boxplot()+labs(title = "How often do use facebook")
+  
+```
+
+ 
+```{r echo=FALSE}
+library(ggplot2)
+
+lda <- c('449$ or less','500-599$','1000-1499$','1500-1999$','>2000$',"jjtu" )
+number <- c(13,23, 68, 47, 21,  3)
+jh <- data.frame(cbind(lda,number)) 
+jh
+```
+
+
+
+
+
+```{r }
+library(ggplot2)
+c <- table(d5$Q18)
+d <- table(d5$Q19)
+ld <- c("I would not buy (0)","$0.99 or less (1)",	"$1 to $1.99 (2)",
+         "$2 to $2.99 (3)",	"$3 to $3.99 (4)",	"$4 to 4.99 (5)",	"$5 or more (6)" )
+q18 <- c(55, 11, 30, 54, 22,  2 , 1)
+q19 <- c(23,  5, 14, 31 ,32 ,41, 29 )
+jk <- data.frame(cbind(q18,q19)) 
+cormat <- round(cor(jk),3)
+head(cormat)
+ 
+```
+
+
+
+
+
+```{r echo=FALSE}
+library(reshape2)
+melted_cormat <- melt(cormat)
+#head(melted_cormat)
+library(ggplot2)
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()
+
+  #barplot(a)
+```

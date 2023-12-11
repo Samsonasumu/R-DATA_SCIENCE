@@ -1,0 +1,175 @@
+---
+title: "LinearRegressHouse"
+author: "authour"
+date: "2023-12-01"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+
+
+---
+title: "housePrice"
+author: "authour"
+date: "2023-11-30"
+output: html_document
+---
+ 
+ Data analysis on Housing Dataset
+Introduction
+	
+Data description
+Link to the dataset
+
+https://www.kaggle.com/datasets/yasserh/housing-prices-dataset/download?datasetVersionNumber=1
+
+This dataset contains information on 546 by 13 variables. The aim would be to predict the housing price based on certain factors like house area, bedrooms, furnished, nearness to mainroad. Machine learning algorithms can be used to create prediction models with this data.  Utilize this dataset for visualization, exploration, and data cleaning. 
+
+ 
+
+##Computational Methods [30 points]
+#• For the choosen dataset, what are the necessary data wrangling steps to make the data ready
+for subsequent analyses?
+• What exploratory analyses and modeling techniques can be used to answer the research
+questions?
+• What metrics will be used to evaluate the quality of the data analysis?
+
+
+```{r  libraries }
+library(ggplot2)
+library(tidyverse)
+  
+df1 <- read.csv("C:/Users/samso/Desktop/Housing.csv")
+head(df1)
+```
+# Load required libraries
+
+```{r  dim }
+dim(df1)
+
+```
+
+
+```{r  null }
+df1 <- na.omit(df1)
+
+#checking for missing values
+sum(is.na(df1))#
+```
+
+```{r   summary }
+summary(df1)
+
+```
+
+```{r  cols }
+colnames(df1)
+
+```
+
+
+## Data Analysis and Results [40 points]
+• Present the data analysis results.
+• Interpret the results in a way to address the research questions.
+
+exploratory analyses  
+```{r outliers, echo=FALSE}
+#some outliers present
+boxplot(df1$price)
+```
+
+```{r hist, echo=FALSE}
+hist(df1$price)
+```
+
+
+
+```{r  corMatrixc }
+#CORRELATION analysis
+temp <- df1 %>% 
+  dplyr::select("price","area","bedrooms","bathrooms","stories")
+head(temp)
+#install.packages("lattice")
+library(lattice)
+
+# rounding to 2 decimal places
+corr_m <- round(cor(temp),2) 
+head(corr_m)  
+```
+
+# Perform data analysis, document the analysis procedure, and evaluate the outcomes.
+
+```{r corrr, echo=FALSE}
+#CORRELATION HEATMAP
+#install.packages("reshape2")
+library(reshape2)
+# reduce the size of correlation matrix
+melted_corr_mat <- melt(corr_m)
+#head(melted_corr_mat)
+
+# section c questio 2 plotting the correlation heatmap
+ggplot(data = melted_corr_mat, aes(x=Var1, y=Var2,
+                                   fill=value)) +
+  geom_tile()
+```
+
+
+
+
+## modeling techniques
+```{r abc }
+# REGRESSION MODEL
+library(dplyr)  # for data manipulation
+library(ggplot2)  # for visualization
+library(caret)  # for modeling
+# Split the dataset into training and testing sets
+set.seed(123)  # for reproducibility
+```
+
+
+```{r  plots, echo=FALSE}
+plot(price ~ area, data = df1)
+
+
+```
+
+
+```{r  linearMode }
+# Train the model using linear regression
+linear_model <- lm(price ~  ., data = df1)
+
+summary(linear_model)
+ 
+```
+
+## FEATURE SELECTION
+
+```{r  important }
+library(caret)
+important_features <-varImp(linear_model)
+important_features
+#DISPLAYS THE TOP FEATURES
+
+```
+
+```{r  besModel }
+model_best <- train(price ~ area + bathrooms + stories, data = df1, method = "lm")
+
+# Print the model summary
+summary(model_best$finalModel)
+
+```

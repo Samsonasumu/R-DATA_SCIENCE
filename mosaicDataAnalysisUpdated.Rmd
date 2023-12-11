@@ -1,0 +1,115 @@
+---
+title: "project3"
+author: "YOUR NAME GOES HERE"
+date: "`r Sys.Date()`"
+output: word_document
+---
+ 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(NHANES)
+#View(NHANES)
+library(mosaic)
+```
+ 
+
+```{r }
+tally(Education~Gender,NHANES,format = "proportion")
+
+tally(Gender~Education,NHANES,format = "proportion")
+
+```
+```{r }
+#tally(HomeOwn~Race1,NHANES,format = "proportion")
+
+# Race by Home Ownership Status
+race_by_status <- table(NHANES$HomeOwn, NHANES$Race1)
+prop_race_by_status <- prop.table(race_by_status, margin = 2)
+
+# Print the distribution
+print(prop_race_by_status)
+
+```
+```{r }
+#exercise 1
+tally(HomeOwn~Race1,NHANES,format = "proportion")
+
+tally(Race1~HomeOwn,NHANES,format = "proportion")
+
+```
+```{r }
+#What proportion of White individuals are renting? [Write your answer using probability notation]
+# Calculate the proportion of White individuals who are renting
+#0.237602009
+#What proportion of renters are white? [Write your answer using probability notation]
+#0.46060237
+
+```
+
+```{r include = FALSE}
+# E X A M P L E -- 
+
+ggplot(NHANES, aes(x=Education, fill=Gender)) +
+         geom_bar()
+
+ggplot(NHANES, aes(x=Gender, fill=Education)) +
+         geom_bar()
+
+ggplot(NHANES, aes(x=Education, fill=Gender)) +
+         geom_bar(position="fill") +
+          guides(x = guide_axis(n.dodge = 2))
+
+ggplot(NHANES, aes(x=HomeOwn, fill=Gender)) +
+         geom_bar(position="fill") +
+          guides(x = guide_axis(angle = 30))
+
+ggplot(NHANES, aes(x=Education, fill=Gender)) +
+         geom_bar(position="dodge")
+
+
+```
+
+
+
+```{r }
+ggplot(NHANES, aes(x=Education, fill=Gender)) +
+         geom_bar()
+```
+
+```{r }
+library(ggplot2)
+library(dplyr)
+# Creating the vertical bar plot
+ 
+ggplot(NHANES, aes(x = Race1, fill = HomeOwn)) +
+  geom_bar(position = "fill", alpha = 0.8) +
+  labs(title = "Home Ownership Status by Race",
+       subtitle = "Distribution of Home Ownership Status by Race") +
+  theme_minimal()
+
+```
+
+ 
+
+```{r }
+ggplot(NHANES, aes(x=HomeOwn, fill=Race1)) +
+         geom_bar(position="fill") +
+          guides(x = guide_axis(angle = 30))
+```
+
+```{r }
+# Creating the horizontal bar plot
+ggplot(NHANES, aes(x = HomeOwn, fill = Race1)) +
+  geom_bar(position = "fill", alpha = 0.8) +
+  labs(title = "Home Ownership Status by Race",
+       subtitle = "Distribution of Home Ownership Status by Race") +
+  theme_minimal()
+
+```
+
+```{r }
+```
+

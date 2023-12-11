@@ -1,0 +1,235 @@
+---
+title: 'wine_predictive '
+author: "authour"
+date: "2023-11-30"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ 
+
+## Introduction
+• What research question(s) would you like to answer?
+ Can we accurately predict the quality of wine based on various features?
+
+Which features contribute the most to predicting the quality of wine?
+Does the type of wine (red or white) affect the accuracy of the prediction model?
+
+build a classification model to predict the quality of wine 
+given the dataset 
+
+Perform correlation analysis of the features
+
+# Why a data-driven, computational approach may be useful to answer the questions?
+
+A data-driven, computational approach may be useful to predict the quality of wine because it allows for the analysis of a large amount of data quickly and efficiently. By using machine learning algorithms and techniques, a classification model can be built that can identify patterns and correlations in the dataset that humans may not be able to detect. This approach provides a systematic and objective way to analyze the data, allowing for more accurate predictions of wine quality.
+
+Additionally, a computational approach can handle complex mathematical calculations and statistical analyses, which are often necessary to build a robust classification model. It can handle large datasets with ease, ensuring that all relevant information is considered during the modeling process. 
+
+Furthermore, a data-driven approach allows for the flexibility and scalability to incorporate new data or update the model as new information becomes available. This is especially important in the wine industry where new wines are produced and data on their quality may need to be continuously incorporated into the model.
+
+Overall, a data-driven, computational approach provides a rigorous and systematic way to analyze the dataset and build a classification model that can accurately predict the quality of wine. It maximizes the use of the available data and provides a reliable framework for decision-making in the wine industry.
+## Describe the dataset that you choose.
+link to the dataset
+
+Based on the provided information, the dataset has 1599 rows and 12 columns. The columns in the dataset are:
+
+1. quality
+2. free sulfur dioxide
+3. alcohol
+4. citric acid
+5. residual sugar
+6. pH
+7. sulphates
+8. fixed acidity
+9. chlorides
+10. volatile acidity
+11. total sulfur dioxide
+12. density
+13. Id
+
+ LINK TO DATASET
+## https://www.kaggle.com/datasets/uciml/red-wine-quality-cortez-et-al-2009/download?datasetVersionNumber=2
+
+   
+
+```{r  libraries }
+library(ggplot2)
+library(tidyverse)
+  
+data <- read.csv("C:/Users/samso/Desktop/wine/winequality-red.csv")
+
+head(data, 1)
+```
+# Load required libraries
+
+```{r  dim }
+dim(data)
+colnames(data)
+```
+
+
+```{r  null }
+#checking for missing values
+sum(is.na(data))#
+```
+
+```{r   summary }
+summary(data)
+
+```
+
+```{r  cols }
+colnames(data)
+
+```
+
+## Computational Methods 
+ 
+
+The following data wrangling procedures are required to prepare the data for machine learning:
+
+Finding any missing values in the dataset: To find any missing values in the dataset, use the code sum(is.na(data)). You can choose an approach to deal with missing values, such as imputation or deletion.
+write an if statement that 
+quality >= 7 is “good”
+quality <= 7 is “bad”
+
+Data splitting in ratio 70:30
+##• What exploratory analyses and modeling techniques can be used to answer the research
+questions?
+Count of quality wine
+
+```{r bar, echo=FALSE}
+#some outliers present
+ggplot(data, aes(x = quality)) +
+  geom_bar()
+
+```
+
+
+```{r outliers, echo=FALSE}
+#some outliers present
+boxplot(data$density)
+```
+
+```{r histogram, echo=FALSE}
+hist(data$density)
+```
+
+
+# Data Analysis and Results
+```{r  cor }
+#CORRELATION analysis
+correlation_matrix <- cor(data)
+correlation_matrix
+
+```
+## interpretaion
+ 
+There is a favorable correlation between alcohol and red wine quality.
+The pH value and alcohol have a slender positive association.
+With fixed acidity, there is a significant positive association between density and citric acid.
+Citric acid, sulfates, density, and fixed acidity are all negatively correlated with pH.
+```{r   if_condition }
+data$quality <- ifelse(data$quality >= 7, 1, 0)
+head(data,5)
+```
+
+
+
+```{r bar33, echo=FALSE}
+ 
+library(ggplot2)
+
+ggplot(data = data, aes(x = quality)) +
+  geom_bar() +
+  scale_x_discrete(labels = c("bad wine", "good wine")) +
+  labs(title = "Types of Wine")
+```
+```{r  colnam }
+head(data)
+```
+
+```{r  defineeew }
+library(ggplot2)
+library(tidyverse)
+X <- data %>% 
+  dplyr::select("fixed.acidity", "volatile.acidity", "sulphates", "alcohol", "density") 
+ 
+y <- data$quality
+```
+
+
+```{r  define }
+head(X)
+```
+
+```{r   splitting }
+# Install the caTools package if it is not already installed
+#install.packages("caTools")
+
+# Load the caTools package
+library(caTools)
+
+# Set the seed for reproducibility
+set.seed(123)
+
+# Split the data into training and testing sets
+split <- sample.split(data$quality, SplitRatio = 0.7)
+
+# Create the training set
+train_data <- subset(data, split == TRUE)
+
+# Create the testing set
+test_data <- subset(data, split == FALSE)
+```
+
+ 
+
+
+```{r   logistic }
+#as.factor(data$quality)
+
+# Fit the logistic regression model
+model <- glm(quality ~ fixed.acidity + volatile.acidity + sulphates + alcohol + density, data = train_data, family = binomial)
+
+# Make predictions on the test data
+newX <- subset(test_data, select = c(fixed.acidity,volatile.acidity,sulphates,alcohol,density))
+predictions <- predict(model, newX, type = "response")
+
+summary(model)
+```
+# interpretation
+
+
+Significant predictors of quality included alcohol, sulphates, volatile acidity, and fixed acidity. There was no discernible relationship between density and quality.
+
+The fixed acidity coefficient is positive, meaning that the likelihood of a wine being of high quality increases as fixed acidity increases.
+
+The volatile acidity coefficient is negative, meaning that the likelihood of a wine being of high quality decreases as volatile acidity increases.
+
+The positive sulphates coefficient suggests that a higher sulphate content is linked to a higher likelihood of a high-quality wine.
+
+The alcohol coefficient is positive, meaning that consuming more alcohol is linked to higher chances of
+
+
+
+
+## Analysis's Scope and Generalizability:
+
+The goal of the analysis is to create a classification model that can identify wine quality by looking at characteristics like acidity, alcohol percentage, residual sugar, and so on. A dataset with details on several wine varieties will be used in the investigation. Developing a model that can precisely categorize wine quality is the aim.
+
+The quality and representativeness of the dataset that was used to create the model determines how generalizable the study is. The model's predictions are more likely to hold true for comparable wine samples if the dataset includes a wide variety of wines and quality ratings. However, the model's generalizability may be compromised if the dataset is narrowly focused or skewed toward particular wine varieties.
+
+# the potential drawbacks and areas for development:
+
+Labeling Bias: Wine quality assessments are arbitrary and sensitive to individual variance. There may be labeling bias in the dataset due to the fact that various wine tasters may have varied preferences and standards for evaluating wine quality. Several wine tasters might be engaged to overcome this constraint, or individual biases could be reduced by using an aggregated score.
+
+Feature Engineering: The investigation might look into other factors that might have an impact on wine quality. For instance, the prediction model may benefit from the influence of grape variety, location, or winemaking methods.
+
+Data Quality: The completeness and quality of the dataset have a significant impact on the model's accuracy. A missing value, an anomaly, or inaccurate data could cause the model to perform poorly. Making certain
